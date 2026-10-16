@@ -127,7 +127,7 @@ Every 10 seconds a random glitch hits for 5 seconds:
 
 ## How the Sprint Works
 
-1. **Pick a task** from [Sprint Tasks](#sprint-tasks). Start with Level 1 if you're new to Python or to this codebase. Tell an organiser which task you've picked so two people don't do the same one.
+1. **Pick a task** (see [Sprint Tasks](#sprint-tasks)). Tell an organiser which one you've picked so two people don't do the same one.
 2. **Create a branch** for it:
    ```bash
    git checkout -b my-task-name
@@ -152,113 +152,16 @@ Every 10 seconds a random glitch hits for 5 seconds:
 
 ## Sprint Tasks
 
-Tasks are grouped by difficulty. Each one lists the files to look at and a hint. The hints point you in the right direction without giving the answer away.
+Tasks come in four levels. Organisers will share the full list at the start of the sprint.
 
-### Level 1: Warm-up
+| Level         | What you'll do                                                        |
+| ------------- | --------------------------------------------------------------------- |
+| 1. Warm-up    | Change values and text: jump height, colours, menu text, key bindings |
+| 2. Core       | Add a small feature: a new level, sounds, a high score, tests         |
+| 3. Bug Hunt   | Track down and fix real bugs in the game                              |
+| 4. Stretch    | Bigger features: a pause screen, a new enemy, a new glitch            |
 
-Good first tasks. Mostly changing values and text.
-
-**1.1 Change the feel of the game**
-Make the player jump higher, run faster or fall more slowly.
-- Files: `src/glitch_runner/config.py`
-- Hint: look at `PLAYER_SPEED`, `JUMP_POWER`, `GRAVITY` and `MAX_FALL_SPEED`. Small changes make a big difference.
-
-**1.2 New colour scheme**
-Give platforms, enemies or the glitch text new colours.
-- Files: `src/glitch_runner/config.py`
-- Hint: colours are `(red, green, blue)` tuples from 0 to 255.
-
-**1.3 Put your name on the menu**
-Add a "Made by" line to the start screen.
-- Files: `src/glitch_runner/presentation/renderer.py`
-- Hint: find `MENU_LINES`.
-
-**1.4 Change how often glitches happen**
-- Files: `src/glitch_runner/config.py`
-- Hint: `GLITCH_INTERVAL` and `GLITCH_DURATION` are in seconds.
-
-**1.5 Add WASD controls**
-Let players use A/D to move and W to jump, as well as the arrow keys.
-- Files: `src/glitch_runner/presentation/input.py`
-- Hint: there are three places to update. Key presses, key releases, and `held_keys()`, which checks which keys are held down every frame.
-
-### Level 2: Core
-
-Add a small feature. You'll read a bit more code.
-
-**2.1 Design level 6**
-- Files: `src/glitch_runner/domain/levels.py`
-- Hint: copy an existing `LevelSpec`, change the platforms and enemies, then add it to `LEVELS` at the bottom. Platforms are `(x, y, width, height)`. The screen is 800 × 600 and `y` counts down from the top.
-- Done when: you can play through it and reach the exit.
-
-**2.2 Add the missing sounds**
-The game looks for `land.wav`, `glitch.wav` and `level_complete.wav` but they don't exist yet.
-- Files: `src/glitch_runner/assets/sounds/`, `src/glitch_runner/infrastructure/audio.py`
-- Hint: `SOUND_FILES` lists the file names the game looks for. Find free sound effects on a site like [Pixabay](https://pixabay.com/sound-effects/) and check the licence.
-- Extra: `Sound.LAND` exists but nothing plays it. Make it play when the player lands. Look at how the jump sound is played in `application/session.py`.
-
-**2.3 High score**
-Remember the best score and show it on the menu.
-- Files: `src/glitch_runner/application/session.py`, `src/glitch_runner/presentation/renderer.py`
-- Hint: `GameSession` already tracks `score`. Look at where the score is reset to 0.
-- Extra: save it to a file so it survives restarting the game.
-
-**2.4 Time bonus countdown**
-Show the remaining time bonus in the HUD while playing.
-- Files: `src/glitch_runner/application/session.py`, `src/glitch_runner/presentation/renderer.py`
-- Hint: look at `_complete_level` to see how the bonus is worked out.
-
-**2.5 Write tests for enemies**
-There are tests for the player, glitches and game flow, but none for enemies.
-- Files: create `tests/test_enemy.py`, read `src/glitch_runner/domain/enemy.py`
-- Hint: `tests/test_player.py` is a good example. Ideas: an enemy turns around at the end of its patrol, a shooter fires when the player is level with it.
-
-### Level 3: Bug Hunt
-
-These are real bugs in the game. Find out why each one happens and fix it. For 3.2 and 3.3, add a test that proves it's fixed.
-
-**3.1 The level name is shown twice**
-The HUD says "Level 1: Level 1: First Glitches".
-- Files: `src/glitch_runner/presentation/renderer.py`
-
-**3.2 Wall jumps don't push you away from the wall**
-A wall jump should kick you sideways, but you only go straight up.
-- Files: `src/glitch_runner/domain/player.py`
-- Hint: the wall jump sets `velocity_x`. Look at what happens to `velocity_x` at the start of the very next `update`.
-
-**3.3 You can never fall off the level**
-`GameSession` checks whether the player fell off the bottom of the screen, but it never happens.
-- Files: `src/glitch_runner/application/session.py`, `src/glitch_runner/domain/player.py`
-- Hint: find the fall check in `session.py`, then look at `_clamp_to_screen` in `player.py`. Decide which behaviour the game should have: losing a life, or a solid floor.
-
-### Level 4: Stretch
-
-Bigger features that touch several files. Pair up if you like.
-
-**4.1 Make F3 toggle debug mode**
-The game has a debug view (hitboxes, FPS, player state) but it can only be switched on by editing `DEBUG_MODE` in `config.py`.
-- Files: `config.py`, `presentation/input.py`, `presentation/renderer.py`, `presentation/sprites.py`
-- Hint: `DEBUG_MODE` is a constant read when the program starts. It needs to become a setting that can change while the game runs.
-
-**4.2 Pause screen**
-Press P to pause and unpause.
-- Files: `application/session.py`, `presentation/input.py`, `presentation/renderer.py`
-- Hint: add a new value to `GameState`. Glitch timers use the clock, so think about what happens to them while paused.
-
-**4.3 New enemy type**
-For example, a "chaser" that walks towards the player.
-- Files: `domain/enemy.py` (behaviour), `presentation/sprites.py` (how it looks), `domain/levels.py` (use it)
-- Hint: start by adding a value to `EnemyType`.
-
-**4.4 New glitch**
-For example, "mirror mode" (left and right swapped) or "tiny player".
-- Files: `domain/glitches.py` (what it does), `presentation/effects.py` (if it changes the screen)
-- Hint: add a value to `GlitchKind`, then handle it in `_activate` and `_deactivate`. The HUD label is created automatically.
-
-**4.5 Fix the standing jitter**
-Turn on debug mode and stand still: "On Ground" flips between True and False.
-- Files: `domain/player.py`
-- Hint: pygame `Rect` positions are whole numbers, so small velocities get rounded away. Look at what happens when the player's bottom edge exactly touches a platform.
+New to Python or to this codebase? Start at level 1. The [Project Tour](#project-tour) shows where each kind of change lives.
 
 ---
 
@@ -328,30 +231,3 @@ Always use `uv run ...` and not plain `python`. uv uses the Python version in `.
 
 **Tests fail before you've changed anything**
 Run `uv sync` again, then `uv run pytest`. If it still fails, tell an organiser.
-
----
-
-## For Organisers
-
-### Codespaces setup
-
-The `.devcontainer/` folder sets up each Codespace automatically:
-
-- Python 3.12 and uv, with dependencies installed by `uv sync`
-- A browser desktop (noVNC) on port 6080 so pygame has a screen to draw on
-- The Python and Ruff VS Code extensions, with format on save
-- Sound switched off (`SDL_AUDIODRIVER=dummy`), since Codespaces has no audio device
-
-To make Codespaces start faster for everyone, turn on **prebuilds**: repository **Settings → Codespaces → Set up prebuild**, branch `master`.
-
-Codespaces usage is billed to whoever creates the codespace (or to your organisation, if the repo belongs to one). Each participant needs a 2-core machine. Ask people to stop their codespace when they're done for the day.
-
-### Building an executable
-
-For a standalone version of the game:
-
-```bash
-uv run --group build pyinstaller GlitchRunner.spec
-```
-
-The executable is written to `dist/`.
