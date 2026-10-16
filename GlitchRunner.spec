@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    ['src/glitch_runner/__main__.py'],
+    pathex=['src'],
     binaries=[],
-    datas=[('assets', 'assets'), ('resource_path.py', '.')],
+    datas=[('src/glitch_runner/assets', 'glitch_runner/assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
